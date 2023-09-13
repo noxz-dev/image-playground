@@ -146,6 +146,31 @@ export class AnnotationViewer {
     return this._viewer.viewport.getMaxZoom();
   }
 
+  //toggle the visibility of the circles and polygon
+  toggleCircles() {
+    this._overlay
+      .node()
+      .querySelectorAll("circle")
+      .forEach((circle) => {
+        if (circle.getAttribute("visibility") === "hidden") {
+          circle.setAttribute("visibility", "visible");
+        } else {
+          circle.setAttribute("visibility", "hidden");
+        }
+      });
+
+    this._overlay
+      .node()
+      .querySelectorAll("polygon")
+      .forEach((polygon) => {
+        if (polygon.getAttribute("visibility") === "hidden") {
+          polygon.setAttribute("visibility", "visible");
+        } else {
+          polygon.setAttribute("visibility", "hidden");
+        }
+      });
+  }
+
   // return the coordinates of the circles in the viewer
   get circles(): IPoint[] {
     const circles: IPoint[] = [];
@@ -164,10 +189,12 @@ export class AnnotationViewer {
   }
 
   set imageSource(value: string) {
+    this.cleanup()
     this._viewer.open({
       type: "image",
       url: value,
     });
+    this.viewer.tileSources.url = value;
   }
 }
 
