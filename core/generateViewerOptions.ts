@@ -11,7 +11,7 @@ export const generateViewerOptions: (id: string, imageUrl: string) => Options = 
     prefixUrl: 'https://openseadragon.github.io/openseadragon/images/',
     tileSources: {
       type: 'image',
-      url: 'https://images.unsplash.com/photo-1692467482423-e7c47521a4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80',
+      url: imageUrl,
     },
     // tileSources: 'https://cg.noxz.dev/big.dzi',
     animationTime: 0.4,
