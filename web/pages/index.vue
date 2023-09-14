@@ -5,34 +5,37 @@
       <Menubar />
     </div>
     <div class="absolute bottom-5 right-5" v-if="active == 'TRANSLATE'">
-      <Button :variant="'secondary'" @click="handleButton"> Apply Image Points </Button>
+      <Button :variant="'secondary'" @click="open = true"> Apply Image Points </Button>
     </div>
     <div class="absolute top-5 left-5">
       <div class="mt-4 flex items-center gap-4">
-									<label for="file-input" class="sr-only"
-										>Import CSV file</label
-									>
-									<input
-										@change="(e: Event) => handleFile(e)"
-										type="file"
-										name="file-input"
-										id="file-input"
-										class="block w-full rounded-md border border-gray-200 bg-white pr-4 text-sm shadow-sm file:mr-4 file:border-0 file:bg-gray-200 file:bg-transparent file:px-4 file:py-3 focus:z-10 focus:border-blue-500 focus:ring-blue-500"
-									/>
-								</div>
+        <label for="file-input" class="sr-only">Import CSV file</label>
+        <input
+          @change="(e: Event) => handleFile(e)"
+          type="file"
+          name="file-input"
+          id="file-input"
+          class="block w-full rounded-md border border-gray-200 bg-white pr-4 text-sm shadow-sm file:mr-4 file:border-0 file:bg-gray-200 file:bg-transparent file:px-4 file:py-3 focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+        />
+
+
+      </div>
     </div>
   </div>
+  <DimensionInput :open="open" @close="open = false" @apply="handleButton"/>
+
 </template>
 
 <script lang="ts" setup>
 import { generateViewerOptions } from "~/core/generateViewerOptions";
 import { AnnotationViewer } from "~/core/viewer";
 import { viewerLoadingState } from "~/core/viewerState";
-import {Button} from '~/components/ui/button'
-import { applyPointsToImage} from "~/core/lib"
-import {activeMode} from '~/core/store'
+import { Button } from "~/components/ui/button";
+import { applyPointsToImage } from "~/core/lib";
+import { activeMode } from "~/core/store";
 
-const active = computed(() => activeMode.value)
+const active = computed(() => activeMode.value);
+const open = ref(false);
 
 const drawingViewer = ref<AnnotationViewer>();
 
@@ -47,22 +50,24 @@ onMounted(() => {
   drawingViewer.value = new AnnotationViewer(viewerOptions);
 });
 
-function handleButton() {
-  const points = drawingViewer.value?.circles
-  if(!points) return
+async function handleButton(payload: { x: number; y: number }) {
+  const points = drawingViewer.value?.circles;
+  if (!points) return;
 
-  applyPointsToImage(points, drawingViewer);
+  await applyPointsToImage(points, drawingViewer, payload);
+
+  open.value = false;
 }
 
 watch(activeMode, () => {
-  if(active.value == 'PLACEHOLDER') {
-    drawingViewer.value?.toggleCircles()
+  if (active.value == "PLACEHOLDER") {
+    drawingViewer.value?.toggleCircles();
   } else {
-    drawingViewer.value?.toggleCircles()
-  }})
+    drawingViewer.value?.toggleCircles();
+  }
+});
 
 async function handleFile(e: Event) {
-
   if (e.target == null) return;
   const target = e.target as HTMLInputElement;
 
@@ -74,8 +79,6 @@ async function handleFile(e: Event) {
 
   const url = URL.createObjectURL(file);
 
-  drawingViewer.value.imageSource = url
-
+  drawingViewer.value.imageSource = url;
 }
-
 </script>

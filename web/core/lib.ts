@@ -1,7 +1,21 @@
 import { AnnotationViewer } from "~/core/viewer";
 import { IPoint } from "~/core/viewer";
 
-export async function applyPointsToImage(points: IPoint[], viewer: Ref<AnnotationViewer | undefined>) {
+interface CustomAnnotationViewer extends AnnotationViewer {
+  viewer: {
+    tileSources: { url: string };
+  } & OpenSeadragon.Viewer;
+}
+
+export async function applyPointsToImage(points: IPoint[], viewer: Ref<CustomAnnotationViewer | undefined>, dimensions: {x: number, y: number}) {
+
+
+  const absoluteCorners = points.map(point => {
+    return {
+      x: point.x * dimensions.x,
+      y: (1 - point.y) * dimensions.y  // (1 - y) to make the starting point at the left bottom
+    };
+  });
 
   if(!viewer.value) return
 
@@ -11,12 +25,11 @@ export async function applyPointsToImage(points: IPoint[], viewer: Ref<Annotatio
 
   const formData = new FormData();
 
-  formData.append('points', JSON.stringify(points));
-
-  // convert blob url to file
-  // const b = await fetch(viewer.value.imageSource).then(r => r.blob())
+  formData.append('points', JSON.stringify(absoluteCorners));
 
   formData.append('file', file);
+
+  formData.append('dimensions', JSON.stringify(dimensions))
 
   const resp: Response = await $fetch('http://localhost:8000/process_image', {
     method: 'POST',

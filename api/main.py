@@ -18,9 +18,10 @@ app.add_middleware(
 )
 
 @app.post("/process_image/")
-async def process_image(file: UploadFile = File(...), points: str = Form(...)):
+async def process_image(file: UploadFile = File(...), points: str = Form(...), dimensions: str = Form(...)):
 
     print(points)
+    print(dimensions)
     # Read the image file and store it in a buffer
     buffer = BytesIO(file.file.read())
     

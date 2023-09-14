@@ -175,6 +175,8 @@ export class AnnotationViewer {
   get circles(): IPoint[] {
     const circles: IPoint[] = [];
 
+    const { height, width } = this._viewer.world.getItemAt(0).getBounds();
+
     this._overlay
       .node()
       .querySelectorAll("circle")
@@ -184,6 +186,16 @@ export class AnnotationViewer {
           y: Number(circle.getAttribute("cy")),
         });
       });
+
+    // revert the y coordinate to the original image coordinate system
+    circles.forEach((circle, idx) => {
+      if(idx < 2) {
+        return
+      }
+      circle.y = circle.y / height;
+
+    })
+
 
     return circles;
   }
