@@ -1,6 +1,6 @@
 const OPTIONS = {
   translate: 'TRANSLATE',
-  placeholder: 'PLACEHOLDER',
+  placeholder: 'SAM',
 } as const
 
 type EnumValues<T> = T[keyof T];

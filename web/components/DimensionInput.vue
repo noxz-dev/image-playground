@@ -12,14 +12,19 @@
               <div>
                
                 <div class="mt-3 text-center sm:mt-5">
-                  <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900 mb-5">Input your dimensions</DialogTitle>
+                  <DialogTitle as="h3" class="text-base font-semibold leading-6 text-gray-900 mb-5">Input your dimensions (in mm)</DialogTitle>
                   <Input placeholder="x in mm" class="mb-2" v-model="x"/>
                   <Input placeholder="y in mm" v-model="y"/>
                 </div>
 
               </div>
               <div class="mt-5 sm:mt-6">
-                <button type="button" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="$emit('apply', {x, y})">Apply</button>
+                <!-- <button type="button" class="inline-flex w-full justify-center rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="$emit('apply', {x, y})">Apply</button> -->
+                <UiButton :class="'w-full'" @click="$emit('apply', {x, y})" :disabled="loading"> 
+                <span v-if="!loading">Apply</span>
+                <span v-else><Icon name="eos-icons:loading"/></span>
+
+                </UiButton>
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -36,7 +41,7 @@ import {Input } from "~/components/ui/input"
 const x = ref(0)
 const y = ref(0)
 
-defineProps<{open: boolean}>()
+defineProps<{open: boolean, loading: boolean}>()
 
 defineEmits<{(event: 'close'): void, (event: 'apply', payload: {x: number, y: number}): void}>()
 

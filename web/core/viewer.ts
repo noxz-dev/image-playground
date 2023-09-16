@@ -2,6 +2,8 @@ import OpenSeadragon, { Point, Viewer } from "openseadragon";
 
 import { SvgOverlay } from "./svg-overlay";
 import { viewerLoadingState, viewerScale, viewerZoom } from "./viewerState";
+import { activeMode } from "~/core/store";
+import { CustomAnnotationViewer } from "~/core/lib";
 
 export interface IPoint {
   x: number;
@@ -39,7 +41,7 @@ export class AnnotationViewer {
       var svgNS = "http://www.w3.org/2000/svg";
       var polygon = document.createElementNS(svgNS, "polygon");
       polygon.setAttribute("fill", "none");
-      polygon.setAttribute("stroke", "white");
+      polygon.setAttribute("stroke", "#e8db59");
       polygon.setAttribute("stroke-width", "0.002");
       var points: Element[] = [];
 
@@ -100,6 +102,10 @@ export class AnnotationViewer {
       };
 
       updatePolygon();
+
+      if (activeMode.value === "SAM") {
+        self.togglePolygons(false);
+      }
     });
   }
 
@@ -127,12 +133,6 @@ export class AnnotationViewer {
     return this._viewer;
   }
 
-  private _stopDraggingIndicator: boolean = false;
-
-  set stopDraggingIndicator(value: boolean) {
-    this._stopDraggingIndicator = value;
-  }
-
   get scale(): number {
     // @ts-ignore
     return this._viewer.viewport._containerInnerSize.x * this._viewer.viewport.getZoom(true);
@@ -147,28 +147,29 @@ export class AnnotationViewer {
   }
 
   //toggle the visibility of the circles and polygon
-  toggleCircles() {
-    this._overlay
-      .node()
-      .querySelectorAll("circle")
-      .forEach((circle) => {
-        if (circle.getAttribute("visibility") === "hidden") {
-          circle.setAttribute("visibility", "visible");
-        } else {
-          circle.setAttribute("visibility", "hidden");
-        }
-      });
+  togglePolygons(show: boolean) {
+      this._overlay
+        .node()
+        .querySelectorAll("circle")
+        .forEach((circle) => {
+          if (show) {
+            circle.setAttribute("visibility", "visible");
+          } else {
+            circle.setAttribute("visibility", "hidden");
+          }
+        });
 
-    this._overlay
-      .node()
-      .querySelectorAll("polygon")
-      .forEach((polygon) => {
-        if (polygon.getAttribute("visibility") === "hidden") {
-          polygon.setAttribute("visibility", "visible");
-        } else {
-          polygon.setAttribute("visibility", "hidden");
-        }
-      });
+      this._overlay
+        .node()
+        .querySelectorAll("polygon")
+        .forEach((polygon) => {
+         if (show) {
+            polygon.setAttribute("visibility", "visible");
+          }
+          else {
+            polygon.setAttribute("visibility", "hidden");
+          }
+        });
   }
 
   // return the coordinates of the circles in the viewer
